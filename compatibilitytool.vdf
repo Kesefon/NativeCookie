@@ -1,0 +1,13 @@
+"compatibilitytools"
+{
+  "compat_tools"
+  {
+    "nativecookie" // Internal name of this tool
+    {
+      "install_path" "."
+      "display_name" "NativeCookie"
+      "from_oslist"  "windows"
+      "to_oslist"    "linux"
+    }
+  }
+}
