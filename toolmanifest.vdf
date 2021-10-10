@@ -2,6 +2,6 @@
 {
   "commandline" "/nativecookie run"
   "commandline_waitforexitandrun" "/nativecookie run"
-  "commandline_getnativepath" "/nativecookie get-native-path"
-  "commandline_getcompatpath" "/nativecookie get-compat-path"
+  "commandline_getnativepath" "/nativecookie path"
+  "commandline_getcompatpath" "/nativecookie path"
 }
