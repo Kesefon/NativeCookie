@@ -32,8 +32,6 @@ when fileExists(currentSourcePath.parentDir() / "greenworks/greenworks-linux64.n
         [staticRead(currentSourcePath.parentDir() / "greenworks/greenworks-linux64.node"),
          staticRead(currentSourcePath.parentDir() / "greenworks/libsdkencryptedappticket.so"),
          staticRead(currentSourcePath.parentDir() / "greenworks/libsteam_api.so")]
-else:
-    const steamLibs = nil
 
 proc downloadElectron(): void =
     let electronZip = getTempDir() / "nativeCookieElectron.zip"
@@ -72,9 +70,6 @@ proc setup(): void =
     if 0 != execShellCmd("patch -f --binary -i \"" & nativeCookieDir /
             "icon_patch.diff" & "\" \"" & path / "resources/app/start.js" & "\""):
         log("Failed!")
-    log("Searching/Downloading electron")
-    electron = findElectron()
-    log("Found: " & electron)
     when declared(steamLibs):
         if not existsEnv("disableSteamLibs"):
             log("Installing greenworks binaries")
@@ -93,6 +88,10 @@ of "run":
 
     if not fileExists(path / "nativeCookieVer") or existsEnv("forceSetup"):
         setup()
+
+    log("Searching/Downloading electron")
+    electron = findElectron()
+    log("Found: " & electron)
 
     log("Starting game")
     quit(execProcess(electron, path, exeArgs, options = {poUsePath}))
