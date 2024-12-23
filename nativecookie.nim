@@ -3,12 +3,9 @@
 import os
 import osproc
 import strutils
-import httpClient
-import zippy/ziparchives
 
-const nativeCookieVersion = "1"
-const electronAbi = "98"
-const electronBuild = "https://github.com/electron/electron/releases/download/v15.1.2/electron-v15.1.2-linux-x64.zip"
+const nativeCookieVersion = "2"
+const electronAbi = "128"
 var electron: string
 let nativeCookieDir = getAppDir()
 let args: seq[string] = commandLineParams()
@@ -25,44 +22,20 @@ if args.high > 1:
 proc log(msg: string): void =
     echo("[NativeCookie]", msg)
 
-when fileExists(currentSourcePath.parentDir() / "greenworks/greenworks-linux64.node") and
-    fileExists(currentSourcePath.parentDir() / "greenworks/libsdkencryptedappticket.so") and
-    fileExists(currentSourcePath.parentDir() / "greenworks/libsteam_api.so"):
-    const steamLibs: array[3, string] =
-        [staticRead(currentSourcePath.parentDir() / "greenworks/greenworks-linux64.node"),
-         staticRead(currentSourcePath.parentDir() / "greenworks/libsdkencryptedappticket.so"),
-         staticRead(currentSourcePath.parentDir() / "greenworks/libsteam_api.so")]
-
-proc downloadElectron(): void =
-    let electronZip = getTempDir() / "nativeCookieElectron.zip"
-    let httpClient = newHttpClient()
-    httpClient.downloadFile(electronBuild, electronZip)
-    extractAll(electronZip, nativeCookieDir / "electron")
-
 proc findElectron(): string =
     if existsEnv("electronBin"):
         log("Using custom electron")
         result = getEnv("electronBin")
         return
 
-    if existsEnv("forceDownload"):
-        log("Forced download")
-        removeDir(nativeCookieDir / "electron/")
-        downloadElectron()
-        result = nativeCookieDir / "electron/electron"
-        return
-
-    result = findExe("electron15")
+    result = findExe("electron32")
     if result == "":
         result = findExe("electron")
         if result == "" or execProcess(result, args = ["-a"]) != electronAbi:
             if fileExists(nativeCookieDir / "electron/electron"):
                 result = nativeCookieDir / "electron/electron"
             else:
-                log("""No compatible electron executable found!
-                Downloading one now""")
-                downloadElectron()
-                result = nativeCookieDir / "electron/electron"
+                log("Error finding electron!")
 
 proc setup(): void =
     log("Setup")
@@ -70,26 +43,23 @@ proc setup(): void =
     if 0 != execShellCmd("patch -f --binary -i \"" & nativeCookieDir /
             "icon_patch.diff" & "\" \"" & path / "resources/app/start.js" & "\""):
         log("Failed!")
-    when declared(steamLibs):
-        if not existsEnv("disableSteamLibs"):
-            log("Installing greenworks binaries")
-            writeFile(path / "resources/app/greenworks/lib/greenworks-linux64.node",
-                    steamLibs[0])
-            writeFile(path / "resources/app/greenworks/lib/libsdkencryptedappticket.so",
-                    steamLibs[1])
-            writeFile(path / "resources/app/greenworks/lib/libsteam_api.so",
-                    steamLibs[2])
+    if fileExists(nativeCookieDir / "greenworks/libsteam_api.so"):
+        log("Installing greenworks binaries")
+        copyFile(nativeCookieDir / "greenworks/greenworks-linux64.node", path / "resources/app/greenworks/lib/greenworks-linux64.node",)
+        copyFile(nativeCookieDir / "greenworks/libsdkencryptedappticket.so", path / "resources/app/greenworks/lib/libsdkencryptedappticket.so",)
+        copyFile(nativeCookieDir / "greenworks/libsteam_api.so", path / "resources/app/greenworks/lib/libsteam_api.so",)
     writeFile(path / "nativeCookieVer", nativeCookieVersion)
 
 case cmd
 of "run":
     if not exe.endsWith("Cookie Clicker.exe"):
+        echo("unknown exe: " & exe)
         quit()
 
-    if not fileExists(path / "nativeCookieVer") or existsEnv("forceSetup"):
+    if not fileExists(path / "nativeCookieVer") or readFile(path / "nativeCookieVer") != nativeCookieVersion or existsEnv("forceSetup"):
         setup()
 
-    log("Searching/Downloading electron")
+    log("Searching electron")
     electron = findElectron()
     log("Found: " & electron)
 

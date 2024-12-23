@@ -18,4 +18,5 @@ You should end up with a structure like this:
 ## TODO
 - Long startup time, when launched by steam
 - Would be nice to make this more generic for other electron games
+  - [Boson](https://github.com/FyraLabs/boson) seems to be doing this
 - MacOS support would be cool

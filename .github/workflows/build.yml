@@ -1,0 +1,40 @@
+name: 'Build'
+
+permissions:
+  contents: write
+
+on: [push]
+
+jobs:
+    Build:
+        runs-on: ubuntu-latest
+        defaults:
+            run:
+                shell: bash
+        steps:
+            - uses: actions/checkout@v4
+            - run: rm */place*here
+            - name: Download dependencies
+              run: |
+                curl -sL "https://github.com/ElectronForConstruct/greenworks-prebuilds/releases/download/v0.8.0/greenworks-electron-v128-linux-x64.node" -o "greenworks/greenworks-linux64.node"
+                curl -sL "https://github.com/greenheartgames/greenworks/raw/refs/tags/v0.8.0/LICENSE" -o "LICENSE.greenworks"
+                curl -sL "https://github.com/electron/electron/releases/download/v32.2.7/electron-v32.2.7-linux-x64.zip" -o "electron/electron.zip"
+                curl -sL "https://partner.steamgames.com/downloads/steamworks_sdk_161.zip" -o "steamworks.zip"
+            - name: Setup Steamworks
+              run: |
+                unzip -j steamworks.zip sdk/redistributable_bin/linux64/libsteam_api.so sdk/public/steam/lib/linux64/libsdkencryptedappticket.so -d greenworks/
+                rm steamworks.zip
+            - name: Setup electron
+              run: |
+                unzip electron/electron.zip -d electron/
+                rm electron/electron.zip
+            - name: Compile
+              run: nimble build
+            - name: Bundle files
+              run: tar -czvf nativecookie.tar.gz nativecookie toolmanifest.vdf README.md LICENSE icon_patch.diff compatibilitytool.vdf greenworks/ electron/
+            - name: Release
+              if: startsWith(github.ref, 'refs/tags/')
+              uses: softprops/action-gh-release@v2
+              with:
+                files: nativecookie.tar.gz
+                fail_on_unmatched_files: true

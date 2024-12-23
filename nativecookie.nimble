@@ -1,6 +1,6 @@
 # Package
 
-version       = "0.1.0"
+version       = "2.0"
 author        = "Kesefon"
 description   = "Run Cookie Clicker with native electron."
 license       = "MIT"
@@ -11,4 +11,3 @@ bin           = @["nativecookie"]
 # Dependencies
 
 requires "nim >= 1.4.8"
-requires "zippy"
