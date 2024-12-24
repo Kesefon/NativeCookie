@@ -16,7 +16,8 @@ You should end up with a structure like this:
 3. Go into the Cookie Clicker properties and set NativeCookie as the compatibility tool.
 
 ## TODO
-- Long startup time, when launched by steam
+- ~~Long startup time, when launched by steam~~
+  - it was the Steam Overlay; disabled for now
 - Would be nice to make this more generic for other electron games
   - [Boson](https://github.com/FyraLabs/boson) seems to be doing this
 - MacOS support would be cool

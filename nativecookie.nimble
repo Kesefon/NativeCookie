@@ -1,6 +1,6 @@
 # Package
 
-version       = "2.0"
+version       = "2.1"
 author        = "Kesefon"
 description   = "Run Cookie Clicker with native electron."
 license       = "MIT"
