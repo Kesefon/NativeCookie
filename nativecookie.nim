@@ -31,7 +31,7 @@ proc findElectron(): string =
     result = findExe("electron32")
     if result == "":
         result = findExe("electron")
-        if result == "" or execProcess(result, args = ["-a"]) != electronAbi:
+        if result == "" or execProcess(result, args = ["-a"], options={}) != electronAbi:
             if fileExists(nativeCookieDir / "electron/electron"):
                 result = nativeCookieDir / "electron/electron"
             else:
