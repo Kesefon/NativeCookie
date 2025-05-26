@@ -23,19 +23,10 @@ proc log(msg: string): void =
     echo("[NativeCookie]", msg)
 
 proc findElectron(): string =
-    if existsEnv("electronBin"):
-        log("Using custom electron")
-        result = getEnv("electronBin")
-        return
-
-    result = findExe("electron32")
-    if result == "":
-        result = findExe("electron")
-        if result == "" or execProcess(result, args = ["-a"], options={}) != electronAbi:
-            if fileExists(nativeCookieDir / "electron/electron"):
-                result = nativeCookieDir / "electron/electron"
-            else:
-                log("Error finding electron!")
+    if fileExists(nativeCookieDir / "electron/electron"):
+        result = nativeCookieDir / "electron/electron"
+    else:
+        log("Error finding electron!")
 
 proc setup(): void =
     log("Setup")
