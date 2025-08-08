@@ -33,8 +33,8 @@ proc setup(): void =
     log("Check if patch is installed on system")
     if 0 != execShellCmd("patch"):
         log("patch is not available on system, sending notification to user")
-        if 0 != execShellCmd("notify-send -a NativeCookie -u normal \"Could not patch the Cookie Clicker window icon because the patch utility is not installed on your system.\""):
-            log("Could not notify user of missing patch due to missing notify-send")
+        if 0 != execShellCmd("zenity --title=\"NativeCookie\" --warning --text=\"Could not patch the Cookie Clicker window icon because the patch utility is not installed on your system. Please install it, then delete the 'nativeCookieVer' file from the Cookie Clicker game files and try again.\""):
+            log("Could not notify user of missing patch due to missing zenity")
     else:
         log("Patch icon")
         if 0 != execShellCmd("patch -f --binary -i \"" & nativeCookieDir /
