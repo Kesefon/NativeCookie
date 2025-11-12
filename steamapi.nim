@@ -1,8 +1,8 @@
 import os
 
 when fileExists("greenworks/libsteam_api.so"):
-    {.link: "./greenworks/libsteam_api.so".}
-    {.passl: "-Wl,-rpath='$ORIGIN/greenworks/'".}
+    {.link: "greenworks/libsteam_api.so".}
+    {.passl: "-Lgreenworks -lsteam_api -Wl,-rpath='$ORIGIN/greenworks/'".}
     {.passc: "-I./include ".}
 
     type
