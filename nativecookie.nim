@@ -1,14 +1,14 @@
 #! /bin/env -S nim c -r
 
+import std/strformat
 import os
 import osproc
 import strutils
 import steamapi
 
 const NimblePkgVersion {.strdefine.} = "Unknown"
-const electronAbi = "128"
-var electron: string
 let nativeCookieDir = getAppDir()
+let electron = nativeCookieDir / "electron/electron"
 let args: seq[string] = commandLineParams()
 if args.high() < 1:
     quit(1)
@@ -23,11 +23,10 @@ if args.high > 1:
 proc log(msg: string): void =
     echo("[NativeCookie]", msg)
 
-proc findElectron(): string =
-    if fileExists(nativeCookieDir / "electron/electron"):
-        result = nativeCookieDir / "electron/electron"
-    else:
-        log("Error finding electron!")
+proc setupIcon(): void =
+    log("Setup icon")
+    let iconPath = path / "resources/app/src/img/icon.ico"
+    writeFile(getHomeDir() / "/.local/share/applications/cookie-electron.desktop",&"[Desktop Entry]\nName=Cookie Clicker\nIcon={iconPath}\nNoDisplay=true\nHidden=true")
 
 proc setup(): void =
     log("Setup")
@@ -35,16 +34,8 @@ proc setup(): void =
     log("Sub to workshop mod")
     subscribeWorkshopItem(3603591910)
 
-    log("Check if patch is installed on system")
-    if 0 != execShellCmd("which patch"):
-        log("patch is not available on system, sending notification to user")
-        if 0 != execShellCmd("zenity --title=\"NativeCookie\" --warning --text=\"Could not patch the Cookie Clicker window icon because the patch utility is not installed on your system. Please install it, then delete the 'nativeCookieVer' file from the Cookie Clicker game files and try again.\""):
-            log("Could not notify user of missing patch due to missing zenity")
-    else:
-        log("Patch icon")
-        if 0 != execShellCmd("patch -f --binary -i \"" & nativeCookieDir /
-            "icon_patch.diff" & "\" \"" & path / "resources/app/start.js" & "\""):
-            log("Failed!")
+    setupIcon()
+
     if fileExists(nativeCookieDir / "greenworks/libsteam_api.so"):
         log("Installing greenworks binaries")
         copyFile(nativeCookieDir / "greenworks/greenworks-linux64.node", path / "resources/app/greenworks/lib/greenworks-linux64.node",)
@@ -60,10 +51,6 @@ of "run":
 
     if not fileExists(path / "nativeCookieVer") or readFile(path / "nativeCookieVer") != NimblePkgVersion or existsEnv("forceSetup"):
         setup()
-
-    log("Searching electron")
-    electron = findElectron()
-    log("Found: " & electron)
 
     log("Starting game")
     putEnv("LD_PRELOAD", "")

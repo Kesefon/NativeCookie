@@ -31,7 +31,7 @@ jobs:
                 unzip electron/electron.zip -d electron/
                 rm electron/electron.zip
             - name: Compile
-              run: nimble build
+              run: nimble build -d:release
             - name: Bundle files
               run: tar -czvf nativecookie.tar.gz nativecookie toolmanifest.vdf README.md LICENSE icon_patch.diff compatibilitytool.vdf greenworks/ electron/
             - name: Release
