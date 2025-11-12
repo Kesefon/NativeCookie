@@ -33,7 +33,7 @@ jobs:
             - name: Compile
               run: nimble build -d:release
             - name: Bundle files
-              run: tar -czvf nativecookie.tar.gz nativecookie toolmanifest.vdf README.md LICENSE icon_patch.diff compatibilitytool.vdf greenworks/ electron/
+              run: tar -czvf nativecookie.tar.gz nativecookie toolmanifest.vdf README.md LICENSE compatibilitytool.vdf greenworks/ electron/
             - name: Release
               if: startsWith(github.ref, 'refs/tags/')
               uses: softprops/action-gh-release@v2
