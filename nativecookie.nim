@@ -3,6 +3,7 @@
 import os
 import osproc
 import strutils
+import steamapi
 
 const NimblePkgVersion {.strdefine.} = "Unknown"
 const electronAbi = "128"
@@ -30,6 +31,10 @@ proc findElectron(): string =
 
 proc setup(): void =
     log("Setup")
+
+    log("Sub to workshop mod")
+    subscribeWorkshopItem(3603591910)
+
     log("Check if patch is installed on system")
     if 0 != execShellCmd("which patch"):
         log("patch is not available on system, sending notification to user")

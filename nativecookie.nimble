@@ -1,11 +1,12 @@
 # Package
 
-version       = "2.4"
+version       = "2.5"
 author        = "Kesefon"
 description   = "Run Cookie Clicker with native electron."
 license       = "MIT"
 srcDir        = "."
 bin           = @["nativecookie"]
+backend       = "cpp"
 
 
 # Dependencies

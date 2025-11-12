@@ -24,6 +24,7 @@ jobs:
             - name: Setup Steamworks
               run: |
                 unzip -j steamworks.zip sdk/redistributable_bin/linux64/libsteam_api.so sdk/public/steam/lib/linux64/libsdkencryptedappticket.so -d greenworks/
+                unzip -j steamworks.zip 'sdk/public/steam/*.h' -d include/steam/
                 rm steamworks.zip
             - name: Setup electron
               run: |
