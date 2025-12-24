@@ -8,7 +8,9 @@ import steamapi
 
 const NimblePkgVersion {.strdefine.} = "Unknown"
 let nativeCookieDir = getAppDir()
-let electron = nativeCookieDir / "electron/electron"
+let electron = if fileExists(nativeCookieDir / "electron/cookie-electron"):
+    nativeCookieDir / "electron/cookie-electron" # workaround for https://github.com/electron/electron/issues/27581
+    else: nativeCookieDir / "electron/electron"
 let args: seq[string] = commandLineParams()
 if args.high() < 1:
     quit(1)
@@ -26,8 +28,11 @@ proc log(msg: string): void =
 
 proc setupIcon(): void =
     log("Setup icon")
-    let iconPath = path / "resources/app/src/img/icon.ico"
-    writeFile(getHomeDir() / "/.local/share/applications/cookie-electron.desktop",&"[Desktop Entry]\nName=Cookie Clicker\nIcon={iconPath}\nNoDisplay=true\nHidden=true")
+    let iconPath = path / "resources/app/src/img/icon.png"
+    if execCmd(&"xdg-icon-resource install --size 512 '{iconPath}' cookie-electron") != 0:
+        log("xdg-icon-resource: failed to install icon; is xdg-utils installed?")
+    if execCmd(&"xdg-desktop-menu install '{nativeCookieDir}/cookie-electron.desktop'") != 0:
+        log("xdg-desktop-menu: failed to install desktop-file; is xdg-utils installed?")
 
 proc setup(): void =
     log("Setup")

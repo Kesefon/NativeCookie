@@ -30,10 +30,11 @@ jobs:
               run: |
                 unzip electron/electron.zip -d electron/
                 rm electron/electron.zip
+                mv electron/electron electron/cookie-electron # workaround for https://github.com/electron/electron/issues/27581
             - name: Compile
               run: nimble build -d:release
             - name: Bundle files
-              run: tar -czvf nativecookie.tar.gz nativecookie toolmanifest.vdf README.md LICENSE compatibilitytool.vdf greenworks/ electron/
+              run: tar -czvf nativecookie.tar.gz nativecookie toolmanifest.vdf README.md LICENSE compatibilitytool.vdf cookie-electron.desktop greenworks/ electron/
             - name: Release
               if: startsWith(github.ref, 'refs/tags/')
               uses: softprops/action-gh-release@v2
