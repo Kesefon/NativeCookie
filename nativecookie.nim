@@ -15,10 +15,11 @@ if args.high() < 1:
 let cmd: string = args[0]
 let exe: string = args[1]
 var path: string = exe.parentDir()
-var exeArgs: seq[string] = newSeq[string](args.high())
-exeArgs[0] = "./resources/app/"
+var exeArgs: seq[string] = newSeq[string](args.high() + 1)
+exeArgs[0] = "--disable-features=AudioServiceOutOfProcess" # workaround for https://github.com/electron/electron/issues/27581
+exeArgs[1] = "./resources/app/"
 if args.high > 1:
-    exeArgs[1..args.high()-1] = args[2..args.high()]
+    exeArgs[2..args.high()] = args[2..args.high()]
 
 proc log(msg: string): void =
     echo("[NativeCookie]", msg)
