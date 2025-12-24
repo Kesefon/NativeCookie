@@ -8,25 +8,31 @@ import steamapi
 
 const NimblePkgVersion {.strdefine.} = "Unknown"
 let nativeCookieDir = getAppDir()
-let electron = nativeCookieDir / "electron/electron"
+let electron = if fileExists(nativeCookieDir / "electron/cookie-electron"):
+    nativeCookieDir / "electron/cookie-electron" # workaround for https://github.com/electron/electron/issues/27581
+    else: nativeCookieDir / "electron/electron"
 let args: seq[string] = commandLineParams()
 if args.high() < 1:
     quit(1)
 let cmd: string = args[0]
 let exe: string = args[1]
 var path: string = exe.parentDir()
-var exeArgs: seq[string] = newSeq[string](args.high())
-exeArgs[0] = "./resources/app/"
+var exeArgs: seq[string] = newSeq[string](args.high() + 1)
+exeArgs[0] = "--disable-features=AudioServiceOutOfProcess" # workaround for https://github.com/electron/electron/issues/27581
+exeArgs[1] = "./resources/app/"
 if args.high > 1:
-    exeArgs[1..args.high()-1] = args[2..args.high()]
+    exeArgs[2..args.high()] = args[2..args.high()]
 
 proc log(msg: string): void =
     echo("[NativeCookie]", msg)
 
 proc setupIcon(): void =
     log("Setup icon")
-    let iconPath = path / "resources/app/src/img/icon.ico"
-    writeFile(getHomeDir() / "/.local/share/applications/cookie-electron.desktop",&"[Desktop Entry]\nName=Cookie Clicker\nIcon={iconPath}\nNoDisplay=true\nHidden=true")
+    let iconPath = path / "resources/app/src/img/icon.png"
+    if execCmd(&"xdg-icon-resource install --size 512 '{iconPath}' cookie-electron") != 0:
+        log("xdg-icon-resource: failed to install icon; is xdg-utils installed?")
+    if execCmd(&"xdg-desktop-menu install '{nativeCookieDir}/cookie-electron.desktop'") != 0:
+        log("xdg-desktop-menu: failed to install desktop-file; is xdg-utils installed?")
 
 proc setup(): void =
     log("Setup")
