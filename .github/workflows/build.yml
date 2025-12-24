@@ -12,7 +12,9 @@ jobs:
             run:
                 shell: bash
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v6
+              with:
+                fetch-depth: 0
             - uses: jiro4989/setup-nim-action@v2
             - run: rm */place*here
             - name: Download dependencies
@@ -32,7 +34,7 @@ jobs:
                 rm electron/electron.zip
                 mv electron/electron electron/cookie-electron # workaround for https://github.com/electron/electron/issues/27581
             - name: Compile
-              run: nimble build -d:release
+              run: nimble build --verbose -d:release
             - name: Bundle files
               run: tar -czvf nativecookie.tar.gz nativecookie toolmanifest.vdf README.md LICENSE compatibilitytool.vdf cookie-electron.desktop greenworks/ electron/
             - name: Release
