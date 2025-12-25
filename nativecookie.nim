@@ -18,8 +18,8 @@ let cmd: string = args[0]
 let exe: string = args[1]
 var path: string = exe.parentDir()
 var exeArgs: seq[string] = newSeq[string](args.high() + 1)
-exeArgs[0] = "--disable-features=AudioServiceOutOfProcess" # workaround for https://github.com/electron/electron/issues/27581
-exeArgs[1] = "./resources/app/"
+exeArgs[0] = "./resources/app/"
+exeArgs[1] = "" # reserved for patchArgs()
 if args.high > 1:
     exeArgs[2..args.high()] = args[2..args.high()]
 
@@ -49,6 +49,18 @@ proc setup(): void =
         copyFile(nativeCookieDir / "greenworks/libsteam_api.so", path / "resources/app/greenworks/lib/libsteam_api.so",)
     writeFile(path / "nativeCookieVer", NimblePkgVersion)
 
+proc patchArgs(): void =
+    # workaround for https://github.com/electron/electron/issues/27581
+    log("Patch args")
+    var i = exeArgs.high()
+    while i > 1:
+        if exeArgs[i].startsWith("--disable-features=") or exeArgs[i].startsWith("-disable-features="):
+            exeArgs[i] = exeArgs[i] & ",AudioServiceOutOfProcess"
+            break
+        dec i
+        if i==1:
+            exeArgs[1] = "--disable-features=AudioServiceOutOfProcess"
+
 case cmd
 of "run":
     if not exe.endsWith("Cookie Clicker.exe"):
@@ -57,6 +69,8 @@ of "run":
 
     if not fileExists(path / "nativeCookieVer") or readFile(path / "nativeCookieVer") != NimblePkgVersion or existsEnv("forceSetup"):
         setup()
+
+    patchArgs()
 
     log("Starting game")
     putEnv("LD_PRELOAD", "")
