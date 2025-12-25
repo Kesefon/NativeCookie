@@ -37,6 +37,10 @@ jobs:
               run: nimble build --verbose -d:release
             - name: Bundle files
               run: tar -czvf nativecookie.tar.gz nativecookie toolmanifest.vdf README.md LICENSE compatibilitytool.vdf cookie-electron.desktop greenworks/ electron/
+            - uses: actions/upload-artifact@v6
+              with:
+                name: nativecookie
+                path: nativecookie.tar.gz
             - name: Release
               if: startsWith(github.ref, 'refs/tags/')
               uses: softprops/action-gh-release@v2
