@@ -16,9 +16,9 @@ jobs:
             with:
               repository: greenheartgames/greenworks
           - run: |
-              mkdir deps/steamworks_sdk
               curl -sL "https://web.archive.org/web/20250601110745/https://partner.steamgames.com/downloads/steamworks_sdk_161.zip" -o "steamworks.zip"
-              unzip -j steamworks.zip 'sdk/*' -d deps/steamworks_sdk
+              unzip steamworks.zip -d deps/
+              mv deps/sdk deps/steamworks_sdk
           - run: npm install
           - run: HOME=~/.electron-gyp node-gyp rebuild --target=32.2.7 --arch=x64 --dist-url=https://electronjs.org/headers
           - uses: actions/upload-artifact@v6
@@ -27,6 +27,7 @@ jobs:
               path: build/Release/greenworks-linux64.node
               retention-days: 1
     Build:
+        needs: Greenworks
         runs-on: ubuntu-latest
         defaults:
             run:
