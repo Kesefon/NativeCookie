@@ -19,7 +19,9 @@ jobs:
               curl -sL "https://web.archive.org/web/20250601110745/https://partner.steamgames.com/downloads/steamworks_sdk_161.zip" -o "steamworks.zip"
               unzip steamworks.zip -d deps/
               mv deps/sdk deps/steamworks_sdk
-          - run: npm install
+          - run: |
+              npm install
+              npm install -g node-gyp
           - run: HOME=~/.electron-gyp node-gyp rebuild --target=32.2.7 --arch=x64 --dist-url=https://electronjs.org/headers
           - uses: actions/upload-artifact@v6
             with:
