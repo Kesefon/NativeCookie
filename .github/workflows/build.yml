@@ -6,8 +6,31 @@ permissions:
 on: [push]
 
 jobs:
+    Greenworks:
+        runs-on: ubuntu-22.04
+        defaults:
+            run:
+                shell: bash
+        steps:
+          - uses: actions/checkout@v6
+            with:
+              repository: greenheartgames/greenworks
+          - run: |
+              curl -sL "https://web.archive.org/web/20250601110745/https://partner.steamgames.com/downloads/steamworks_sdk_161.zip" -o "steamworks.zip"
+              unzip steamworks.zip -d deps/
+              mv deps/sdk deps/steamworks_sdk
+          - run: |
+              npm install
+              npm install -g node-gyp
+          - run: HOME=~/.electron-gyp node-gyp rebuild --target=32.2.7 --arch=x64 --dist-url=https://electronjs.org/headers
+          - uses: actions/upload-artifact@v6
+            with:
+              name: greenworks-bin
+              path: build/Release/greenworks-linux64.node
+              retention-days: 1
     Build:
-        runs-on: ubuntu-latest
+        needs: Greenworks
+        runs-on: ubuntu-22.04
         defaults:
             run:
                 shell: bash
@@ -19,10 +42,13 @@ jobs:
             - run: rm */place*here
             - name: Download dependencies
               run: |
-                curl -sL "https://github.com/ElectronForConstruct/greenworks-prebuilds/releases/download/v0.8.0/greenworks-electron-v128-linux-x64.node" -o "greenworks/greenworks-linux64.node"
                 curl -sL "https://github.com/greenheartgames/greenworks/raw/refs/tags/v0.8.0/LICENSE" -o "LICENSE.greenworks"
                 curl -sL "https://github.com/electron/electron/releases/download/v32.2.7/electron-v32.2.7-linux-x64.zip" -o "electron/electron.zip"
                 curl -sL "https://web.archive.org/web/20250601110745/https://partner.steamgames.com/downloads/steamworks_sdk_161.zip" -o "steamworks.zip"
+            - uses: actions/download-artifact@v5
+              with:
+                name: greenworks-bin
+                path: greenworks/
             - name: Setup Steamworks
               run: |
                 unzip -j steamworks.zip sdk/redistributable_bin/linux64/libsteam_api.so sdk/public/steam/lib/linux64/libsdkencryptedappticket.so -d greenworks/
