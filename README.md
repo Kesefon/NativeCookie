@@ -1,23 +1,25 @@
-# NativeCookie
-Run Cookie Clicker Steam edition with native Electron on Linux.
+# NativeGuessr
+Run GeoGuessr Steam edition with native Electron on Linux.
 
 ## Installation
-0. Install `xdg-utils` from your distro's package manager (this is only required for proper window icons)
-1. Download the latest [release archive](https://github.com/Kesefon/NativeCookie/releases/latest) and extract it into the `~/.steam/root/compatibilitytools.d/` folder.  
+
+1. Download the latest [release archive](https://github.com/Kesefon/NativeGuessr/releases/latest) and extract it into the `~/.steam/root/compatibilitytools.d/` folder.  
 Note: the `compatibilitytools.d` folder might not exist. If that's the case just create it manually.  
 You should end up with a structure like this:  
 ```
-~/.steam/root/compatibilitytools.d/nativecookie/
+~/.steam/root/compatibilitytools.d/nativeguessr/
 ├── compatibilitytool.vdf
-├── icon_patch.diff
+├── electron/
+├── greenworks/
 ├── LICENSE
 ├── nativecookie
 └── toolmanifest.vdf
 ```
 2. Restart Steam.
-3. Go into the Cookie Clicker properties and set NativeCookie as the compatibility tool.
+3. Go into the GeoGuessr properties and set NativeGuessr as the compatibility tool.
 
 ## TODO
+- This tool is based on [NativeCookie](https://github.com/Kesefon/NativeCookie) and could use some code clean ups. (No problems during usage; just ugly code)
 - ~~Long startup time, when launched by steam~~
   - it was the Steam Overlay; disabled for now
 - Would be nice to make this more generic for other electron games

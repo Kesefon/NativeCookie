@@ -3,5 +3,5 @@
   "version" "2"
   "require_tool_appid" "1628350"
   "commandline" "/nativecookie run"
-  "compatmanager_layer_name" "nativecookie"
+  "compatmanager_layer_name" "nativeguessr"
 }

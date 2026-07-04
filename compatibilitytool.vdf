@@ -2,10 +2,10 @@
 {
   "compat_tools"
   {
-    "nativecookie" // Internal name of this tool
+    "nativeguessr" // Internal name of this tool
     {
       "install_path" "."
-      "display_name" "NativeCookie"
+      "display_name" "NativeGuessr"
       "from_oslist"  "windows"
       "to_oslist"    "linux"
     }

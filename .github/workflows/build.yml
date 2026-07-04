@@ -6,30 +6,7 @@ permissions:
 on: [push]
 
 jobs:
-    Greenworks:
-        runs-on: ubuntu-22.04
-        defaults:
-            run:
-                shell: bash
-        steps:
-          - uses: actions/checkout@v6
-            with:
-              repository: greenheartgames/greenworks
-          - run: |
-              curl -sL "https://web.archive.org/web/20250601110745/https://partner.steamgames.com/downloads/steamworks_sdk_161.zip" -o "steamworks.zip"
-              unzip steamworks.zip -d deps/
-              mv deps/sdk deps/steamworks_sdk
-          - run: |
-              npm install
-              npm install -g node-gyp
-          - run: HOME=~/.electron-gyp node-gyp rebuild --target=32.2.7 --arch=x64 --dist-url=https://electronjs.org/headers
-          - uses: actions/upload-artifact@v6
-            with:
-              name: greenworks-bin
-              path: build/Release/greenworks-linux64.node
-              retention-days: 1
     Build:
-        needs: Greenworks
         runs-on: ubuntu-22.04
         defaults:
             run:
@@ -42,34 +19,32 @@ jobs:
             - run: rm */place*here
             - name: Download dependencies
               run: |
-                curl -sL "https://github.com/greenheartgames/greenworks/raw/refs/tags/v0.8.0/LICENSE" -o "LICENSE.greenworks"
-                curl -sL "https://github.com/electron/electron/releases/download/v32.2.7/electron-v32.2.7-linux-x64.zip" -o "electron/electron.zip"
-                curl -sL "https://web.archive.org/web/20250601110745/https://partner.steamgames.com/downloads/steamworks_sdk_161.zip" -o "steamworks.zip"
-            - uses: actions/download-artifact@v5
-              with:
-                name: greenworks-bin
-                path: greenworks/
+                curl -sL "https://github.com/electron/electron/releases/download/v42.6.0/electron-v42.6.0-linux-x64.zip" -o "electron/electron.zip"
+                curl -sL "https://web.archive.org/web/20260704231758/https://partner.steamgames.com/downloads/steamworks_sdk_164.zip" -o "steamworks.zip"
             - name: Setup Steamworks
               run: |
                 unzip -j steamworks.zip sdk/redistributable_bin/linux64/libsteam_api.so sdk/public/steam/lib/linux64/libsdkencryptedappticket.so -d greenworks/
-                unzip -j steamworks.zip 'sdk/public/steam/*.h' -d include/steam/
                 rm steamworks.zip
             - name: Setup electron
               run: |
                 unzip electron/electron.zip -d electron/
                 rm electron/electron.zip
-                mv electron/electron electron/cookie-electron # workaround for https://github.com/electron/electron/issues/27581
+            - name: Setup koffi
+              run: |
+                npm i koffi@2.15.2
+                mkdir -p electron/resources/koffi/build/koffi/linux_x64/
+                mv node_modules/koffi/build/koffi/linux_x64/koffi.node electron/resources/koffi/build/koffi/linux_x64/koffi.node
             - name: Compile
               run: nimble build --verbose -d:release
             - name: Bundle files
-              run: tar -czvf nativecookie.tar.gz nativecookie toolmanifest.vdf README.md LICENSE compatibilitytool.vdf cookie-electron.desktop greenworks/ electron/
+              run: tar -czvf nativeguessr.tar.gz nativecookie toolmanifest.vdf README.md LICENSE compatibilitytool.vdf greenworks/ electron/
             - uses: actions/upload-artifact@v6
               with:
-                name: nativecookie
-                path: nativecookie.tar.gz
+                name: nativeguessr
+                path: nativeguessr.tar.gz
             - name: Release
               if: startsWith(github.ref, 'refs/tags/')
               uses: softprops/action-gh-release@v2
               with:
-                files: nativecookie.tar.gz
+                files: nativeguessr.tar.gz
                 fail_on_unmatched_files: true
